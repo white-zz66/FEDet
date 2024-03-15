@@ -228,6 +228,20 @@ class DCNv3(nn.Module):
                 'channels_first',
                 'channels_last'),
             build_act_layer(act_layer))
+        self.dw_conv2= nn.Sequential(
+            nn.Conv2d(
+                channels,
+                channels,
+                kernel_size=kernel_size,
+                stride=1,
+                padding=(kernel_size - 1) // 2,
+                groups=channels),
+            build_norm_layer(
+                channels,
+                norm_layer,
+                'channels_first',
+                'channels_last'),
+            build_act_layer(act_layer))
         self.offset = nn.Linear(
             channels,
             group * kernel_size * kernel_size * 2)
@@ -248,7 +262,7 @@ class DCNv3(nn.Module):
         xavier_uniform_(self.output_proj.weight.data)
         constant_(self.output_proj.bias.data, 0.)
 
-    def forward(self, input):
+    def forward(self, input,offset_aid):
         """
         :param query                       (N, H, W, C)
         :return output                     (N, H, W, C)
@@ -260,7 +274,9 @@ class DCNv3(nn.Module):
 
         x1 = input.permute(0, 3, 1, 2)
         x1 = self.dw_conv(x1)
-        offset = self.offset(x1)
+
+        x2 = self.dw_conv2(offset_aid)
+        offset = self.offset(x2)
         mask = self.mask(x1).reshape(N, H, W, self.group, -1)
         mask = F.softmax(mask, -1).reshape(N, H, W, -1).type(dtype)
 

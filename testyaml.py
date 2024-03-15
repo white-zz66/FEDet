@@ -13,10 +13,10 @@ from ultralytics import YOLO
 
 
 
-# CFG = '/home/white/PycharmProjects/ultralytics-main/ultralytics/models/v8/yolov8x-dpe.yaml'
-CFG = '/ultralytics/cfg/models/v8/yolov8x-SPPFImproveAndFAM.yaml'
+# CFG = '/home/white/PycharmProjects/ultrayltics-main/ultralytics/models/v8/yolov8x-dpe.yaml'
+CFG = '//home/white/sharedirs/论文模型/YOLOv8/ultrayltics-main/ultralytics/cfg/models/v8/yolov8x-SPPFImproveAndFAM.yaml'
 # SOURCE = ROOT / 'assets/bus.jpg'
-SOURCE = '/coco/images/val2017/KK-c7nX9lhV8e__0.jpg'
+SOURCE = '/home/white/sharedirs/图片/images__5.jpg'
 
 
 def test_model_forward():

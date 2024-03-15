@@ -577,7 +577,7 @@ class BaseTrainer:
     def check_resume(self, overrides):
         """Check if resume checkpoint exists and update arguments accordingly."""
         resume = self.args.resume
-        # resume = '/root/autodl-tmp/ultralytics-main/runs/detect/train/weights/last.pt'
+        # resume = '/root/autodl-tmp/ultrayltics-main/runs/detect/train/weights/last.pt'
         if resume:
             try:
                 exists = isinstance(resume, (str, Path)) and Path(resume).exists()
@@ -602,7 +602,7 @@ class BaseTrainer:
 
     def resume_training(self, ckpt):
         """Resume YOLO training from given epoch and best fitness."""
-        # ckpt = torch.load('/root/autodl-tmp/ultralytics-main/runs/detect/train/weights/last.pt')
+        # ckpt = torch.load('/root/autodl-tmp/ultrayltics-main/runs/detect/train/weights/last.pt')
         if ckpt is None:
             return
         best_fitness = 0.0

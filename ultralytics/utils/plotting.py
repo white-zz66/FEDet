@@ -80,8 +80,8 @@ class Annotator:
             self.im = im if isinstance(im, Image.Image) else Image.fromarray(im)
             self.draw = ImageDraw.Draw(self.im)
             try:
-                font = check_font('/root/autodl-tmp/ultralytics-main/ultralytics/Arial.Unicode.ttf' if non_ascii else font)
-                # font = '/root/autodl-tmp/ultralytics-main/ultralytics/Arial.ttf'
+                font = check_font('/root/autodl-tmp/ultrayltics-main/ultralytics/Arial.Unicode.ttf' if non_ascii else font)
+                # font = '/root/autodl-tmp/ultrayltics-main/ultralytics/Arial.ttf'
                 size = font_size or max(round(sum(self.im.size) / 2 * 0.035), 12)
                 self.font = ImageFont.truetype(str(font), size)
             except Exception:

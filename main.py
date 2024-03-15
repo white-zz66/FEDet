@@ -13,13 +13,13 @@ if __name__ == '__main__':
     # model.train(**{'cfg': 'ultralytics/yolo/cfg/default.yaml', 'data': 'ultralytics/datasets/coco.yaml'})
 
     # 使用yaml配置文件来创建模型,并导入预训练权重.
-    model = YOLO('/ultralytics/cfg/models/v8/yolov8x-SPPFImproveAndFAM.yaml')
-    model.load('/ultralytics-main/yolov8x.pt')
-    model.train(**{'cfg': 'ultralytics/yolo/cfg/default.yaml', 'data': '/ultralytics-main/ultralytics/cfg/datasets/coco.yaml'})
+    # model = YOLO('/ultralytics/cfg/models/v8/yolov8x-SPPFImproveAndFAM.yaml')
+    # model.load('/ultrayltics-main/yolov8x.pt')
+    # model.train(**{'cfg': 'ultralytics/yolo/cfg/default.yaml', 'data': '/ultrayltics-main/ultralytics/cfg/datasets/coco.yaml'})
     
     # 模型验证
-    # model = YOLO('best.pt')
-    # model.val(**{'data': '/root/autodl-tmp/ultralytics-main/ultralytics/cfg/datasets/coco.yaml','split':'test'})
+    model = YOLO('/home/white/sharedirs/两个创新一起.pt')
+    model.val(**{'data': '/root/autodl-tmp/ultrayltics-main/ultralytics/cfg/datasets/coco.yaml','split':'test'})
     
     # # 模型推理
     # model = YOLO('runs/detect/yolov8n_exp/weights/best.pt')
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     
 #     #断点续训
 #     # Load a model
-#     model = YOLO('/root/autodl-tmp/ultralytics-main/runs/detect/train5/weights/last.pt')  # load a partially trained model
+#     model = YOLO('/root/autodl-tmp/ultrayltics-main/runs/detect/train5/weights/last.pt')  # load a partially trained model
 
 #     # Resume training
 #     results = model.train(resume=True)

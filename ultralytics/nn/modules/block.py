@@ -13,7 +13,7 @@ import torchvision
 from .fusion_utils import ConvBatchNorm, DownBlock, UpBlock_attention
 
 __all__ = ('DFL', 'HGBlock', 'HGStem', 'SPP', 'SPPF', 'C1', 'C2', 'C3', 'C2f', 'C3x', 'C3TR', 'C3Ghost',
-           'GhostBottleneck', 'Bottleneck', 'BottleneckCSP', 'Proto', 'RepC3','MFRM','C3_CoT','C2f_faster','EGCA','MADFM','DeformableProjEmbed','FuseBlock','Shortcut1','FeatureAlign')
+           'GhostBottleneck', 'Bottleneck', 'BottleneckCSP', 'Proto', 'RepC3','MFGM','C3_CoT','C2f_faster','EGCA','FSCM','DeformableProjEmbed','FuseBlock','Shortcut1','FeatureAlign')
 class Shortcut1(nn.Module):
     def __init__(self, select = 0):
         super(Shortcut1, self).__init__()
@@ -341,7 +341,7 @@ class BottleneckCSP(nn.Module):
         y2 = self.cv2(x)
         return self.cv4(self.act(self.bn(torch.cat((y1, y2), 1))))
 
-# MFRM
+# MFGM
 class Shortcut(nn.Module):
     def __init__(self, dimension=0):
         super(Shortcut, self).__init__()
@@ -404,10 +404,10 @@ def add_conv(in_ch, out_ch, ksize, stride, leaky=True):
     return stage
 
 
-class MFRM(nn.Module):
+class MFGM(nn.Module):
     # CSP https://github.com/WongKinYiu/CrossStagePartialNetworks
     def __init__(self, c1, c2, n=1, shortcut=False, g=1, e=0.5, k=(5, 9, 13)):
-        super(MFRM, self).__init__()
+        super(MFGM, self).__init__()
         c_ = int(2 * c2 * e)  # hidden channels
         self.cv1 = Conv(c1, c_, 1, 1)
         self.cv2 = Conv(c1, c_, 1, 1)
@@ -874,9 +874,9 @@ class Conv2d(torch.nn.Conv2d):
             x = self.activation(x)
         return x
 
-class MADFM(nn.Module):  # FaPN full version
+class FSCM(nn.Module):  # FaPN full version
     def __init__(self, c1,out_nc=128, norm=None):
-        super(MADFM, self).__init__()
+        super(FSCM, self).__init__()
         # print('out_nc',out_nc)
         # self.lateral_conv = FeatureSelectionModule(in_nc, out_nc, norm="")
         # self.offset = Conv2d(out_nc * 2, out_nc, kernel_size=1, stride=1, padding=0, bias=False, norm=norm)
@@ -887,6 +887,7 @@ class MADFM(nn.Module):  # FaPN full version
         self.conv = Conv(out_nc*2,out_nc,k=1,s=1)
         self.conv1 = Conv(out_nc//2,out_nc,k=1,s=1)
         self.conv2 = Conv(out_nc,out_nc,k=3,s=2)
+        self.conv3 = Conv(out_nc * 2, out_nc, k=1, s=1)
         self.SGE = SpatialGroupEnhance(64)
 
     def forward(self, x):
@@ -904,20 +905,19 @@ class MADFM(nn.Module):  # FaPN full version
             feat_up = self.conv2(x[1])
         else:
             feat_up = x[1]
-        # feat_arm = self.lateral_conv(feat_l)  # 0~1 * feats
-        # offset = self.offset(torch.cat([feat_arm, feat_up * 2], dim=1))  # concat for offset by compute the dif
-        # feat_up = feat_up.permute(0,2,3,1)
-        # feat_align = self.relu(self.dcpack_L2(feat_up))  # [feat, offset]
+
+
         feat_up = feat_up.permute(0,2,3,1)
-        # feat_up = feat_up.cuda()
-        # dcnv3 = self.dcpack_L2(feat_up).to(self.device).cpu()
-        dcnv3 = self.dcpack_L2(feat_up)
+        x[0] = x[0].permute(0, 2, 3, 1)
+
+        offset_aid = self.conv3((torch.cat([feat_up,x[0]],dim=3).permute(0,3,1,2)))
+
+        dcnv3 = self.dcpack_L2(feat_up,offset_aid)
 
         feat_align = self.relu(dcnv3)  # [feat, offset]
         feat_align = feat_align.permute(0,3,1,2)
-        # feat_align = self.relu(self.dcpack_L2([feat_up, offset], main_path))  # [feat, offset]
-        # if x[0].is_cuda:
-        #     feat_align = feat_align.to('cuda')
+        x[0]=x[0].permute(0,3,1,2)
+
         return feat_align + x[0]
    
 class FeatureAlign(nn.Module):  # FaPN full version

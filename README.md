@@ -1,2 +1,2 @@
-MFENet:Multi-scale Feature Enhancement Network For Panoramic Image 
-Object Detection
+FEDet:Feature Enhancement Object Detection with Panoramic Images
+
